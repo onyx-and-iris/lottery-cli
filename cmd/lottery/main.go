@@ -9,8 +9,9 @@ import (
 
 	"charm.land/huh/v2"
 	"github.com/charmbracelet/fang"
-	"github.com/onyx-and-iris/lottery-cli"
 	"github.com/spf13/cobra"
+
+	"github.com/onyx-and-iris/lottery-cli"
 )
 
 var version string
@@ -40,7 +41,7 @@ var cmd = &cobra.Command{
 					Options(
 						huh.NewOption("Lotto", "lotto"),
 						huh.NewOption("EuroMillions", "euromillions"),
-						huh.NewOption("SetForLife", "setforlife"),
+						huh.NewOption("Set For Life", "setforlife"),
 						huh.NewOption("Thunderball", "thunderball"),
 						huh.NewOption("Powerball", "powerball"),
 					).
@@ -69,7 +70,11 @@ var cmd = &cobra.Command{
 }
 
 func main() {
-	if err := fang.Execute(context.Background(), cmd, fang.WithVersion(versionFromBuild())); err != nil {
+	if err := fang.Execute(
+		context.Background(),
+		cmd,
+		fang.WithVersion(versionFromBuild()),
+	); err != nil {
 		os.Exit(1)
 	}
 }
