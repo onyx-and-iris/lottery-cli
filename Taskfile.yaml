@@ -1,0 +1,65 @@
+version: '3'
+
+vars:
+  PROGRAM: lottery
+  SHELL: '{{if eq .OS "Windows_NT"}}powershell{{end}}'
+  BIN_DIR: bin
+  VERSION:
+    sh: 'git describe --tags $(git rev-list --tags --max-count=1)'
+
+  WINDOWS: '{{.BIN_DIR}}/{{.PROGRAM}}_windows_amd64.exe'
+  LINUX: '{{.BIN_DIR}}/{{.PROGRAM}}_linux_amd64'
+  MACOS: '{{.BIN_DIR}}/{{.PROGRAM}}_darwin_amd64'
+
+tasks:
+  default:
+    desc: Build the lottery project
+    cmds:
+      - task: build
+
+  build:
+    desc: Build the lottery project
+    deps: [vet]
+    cmds:
+      - task: build-windows
+      - task: build-linux
+      - task: build-macos
+
+  vet:
+    desc: Vet the code
+    deps: [fmt]
+    cmds:
+      - go vet ./...
+
+  fmt:
+    desc: Fmt the code
+    cmds:
+      - go fmt ./...
+
+  build-windows:
+    desc: Build the lottery project for Windows
+    cmds:
+      - GOOS=windows GOARCH=amd64 go build -o {{.WINDOWS}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
+    internal: true
+
+  build-linux:
+    desc: Build the lottery project for Linux
+    cmds:
+      - GOOS=linux GOARCH=amd64 go build -o {{.LINUX}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
+    internal: true
+
+  build-macos:
+    desc: Build the lottery project for macOS
+    cmds:
+      - GOOS=darwin GOARCH=amd64 go build -o {{.MACOS}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
+    internal: true
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test ./...
+
+  clean:
+    desc: Clean the build artifacts
+    cmds:
+      - '{{.SHELL}} rm -r {{.BIN_DIR}}'
