@@ -4,7 +4,7 @@
 
 # lottery
 
-Play National Lottery from your terminal.
+Play National Lottery games from your terminal.
 
 ![Selection Prompt](./img/selectionprompt.png)
 
@@ -18,5 +18,5 @@ go install github.com/onyx-and-iris/lottery-cli/cmd/lottery@latest
 
 ## Special Thanks
 
--   [spf13](https://github.com/spf13) for the [cobra](https://github.com/spf13/cobra)
+-   [spf13](https://github.com/spf13) for the [cobra](https://github.com/spf13/cobra) package.
 -   [Charm](https://github.com/charmbracelet) developers for the [fang](https://github.com/charmbracelet/fang), [lipgloss](https://github.com/charmbracelet/lipgloss) and [huh](https://github.com/charmbracelet/huh) packages.
