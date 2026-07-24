@@ -141,6 +141,11 @@ func renderDrawCollection(title string, entries []string) string {
 
 	separator := separatorStyle.Render(strings.Repeat("─", maxLineWidth(entries)))
 	body := strings.Join(entries, "\n"+separator+"\n")
+	if len(entries) == 1 {
+		title = titleStyle.Render(title + " draw")
+	} else {
+		title = titleStyle.Render(title + " draws")
+	}
 
-	return cardStyle.Render(titleStyle.Render(title+" draws") + "\n" + body)
+	return cardStyle.Render(title + "\n" + body)
 }

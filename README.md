@@ -69,5 +69,5 @@ lottery -k=euromillions -c=3
 
 ## Special Thanks
 
--   [spf13](https://github.com/spf13) for the [cobra](https://github.com/spf13/cobra) package.
+-   [spf13](https://github.com/spf13) for the [cobra](https://github.com/spf13/cobra) and [viper](https://github.com/spf13/viper) packages.
 -   [Charm](https://github.com/charmbracelet) developers for the [fang](https://github.com/charmbracelet/fang), [lipgloss](https://github.com/charmbracelet/lipgloss) and [huh](https://github.com/charmbracelet/huh) packages.
