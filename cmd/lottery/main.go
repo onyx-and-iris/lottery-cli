@@ -81,10 +81,19 @@ var cmd = &cobra.Command{
 		}
 
 		count := viper.GetInt("count")
+		includeDrawHeading := count > 1
+		renders := make([]string, 0, count)
+		drawTitle := "Lottery"
 
-		for range count {
+		for i := range count {
 			l.Draw()
-			fmt.Println(renderDraw(l))
+			title, entry := renderDrawEntry(l, i+1, includeDrawHeading)
+			drawTitle = title
+			renders = append(renders, entry)
+		}
+
+		if len(renders) > 0 {
+			fmt.Println(renderDrawCollection(drawTitle, renders))
 		}
 
 		return nil
