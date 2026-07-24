@@ -25,6 +25,9 @@ func ParseKind(kind string) (Kind, error) {
 	case "powerball":
 		return KindPowerball, nil
 	default:
-		return "", fmt.Errorf("invalid lottery kind: %s", kind)
+		return "", fmt.Errorf(
+			"invalid lottery kind: %s, must be one of: lotto, euromillions, setforlife, thunderball, powerball",
+			kind,
+		)
 	}
 }

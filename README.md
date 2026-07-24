@@ -20,6 +20,7 @@ go install github.com/onyx-and-iris/lottery-cli/cmd/lottery@latest
 
 *flags*
 
+-   --kind/-k: The kind of lottery.
 -   --count/-c: Number of draws to generate.
 -   --count-prompt/-C: Prompt for the number of draws to generate.
 > Note. If both --count and --count-prompt are passed the count prompt will win.
@@ -29,19 +30,42 @@ go install github.com/onyx-and-iris/lottery-cli/cmd/lottery@latest
 ```bash
 #!/usr/bin/env bash
 
+export LOTTERY_KIND=lotto
 export LOTTERY_COUNT=3
 export LOTTERY_COUNT_PROMPT=false
 ```
 
 ## Use
 
-There are no subcommands, just run the CLI directly passing any desired flags:
+Run with the selection prompt without prompting for a count:
 
 ```console
-lottery --count=3
+lottery
 ```
 
-You will then be entered into the selection prompt.
+Run with the selection prompt but also prompt for a count:
+
+```console
+lottery --count-prompt
+```
+
+Run with the selection prompt but pass in the count directly:
+
+```console
+lottery --count=4
+```
+
+Run a single draw directly:
+
+```console
+lottery -k=euromillions 
+```
+
+Run multiple draws directly:
+
+```console
+lottery -k=euromillions -c=3
+```
 
 ## Special Thanks
 

@@ -32,29 +32,40 @@ func versionFromBuild() string {
 var cmd = &cobra.Command{
 	Use:   "lottery",
 	Short: "A CLI for National Lottery games.",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		kindStr := viper.GetString("kind")
+		if kindStr != "" {
+			_, err := lottery.ParseKind(kindStr)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var selected string
-
-		form := huh.NewForm(
-			huh.NewGroup(
-				huh.NewSelect[string]().
-					Title("Pick a lottery.").
-					Options(
-						huh.NewOption("Lotto", "lotto"),
-						huh.NewOption("EuroMillions", "euromillions"),
-						huh.NewOption("Set For Life", "setforlife"),
-						huh.NewOption("Thunderball", "thunderball"),
-						huh.NewOption("Powerball", "powerball"),
-					).
-					Value(&selected),
-			),
-		)
-		err := form.Run()
-		if err != nil {
-			return err
+		kindStr := viper.GetString("kind")
+		if kindStr == "" {
+			form := huh.NewForm(
+				huh.NewGroup(
+					huh.NewSelect[string]().
+						Title("Pick a lottery.").
+						Options(
+							huh.NewOption("Lotto", "lotto"),
+							huh.NewOption("EuroMillions", "euromillions"),
+							huh.NewOption("Set For Life", "setforlife"),
+							huh.NewOption("Thunderball", "thunderball"),
+							huh.NewOption("Powerball", "powerball"),
+						).
+						Value(&kindStr),
+				),
+			)
+			err := form.Run()
+			if err != nil {
+				return err
+			}
 		}
 
-		kind, err := lottery.ParseKind(selected)
+		kind, err := lottery.ParseKind(kindStr)
 		if err != nil {
 			return err
 		}
@@ -101,6 +112,7 @@ var cmd = &cobra.Command{
 }
 
 func init() {
+	cmd.Flags().StringP("kind", "k", "", "Lottery kind to generate draws for.")
 	cmd.Flags().IntP("count", "c", 1, "Number of draws to generate.")
 	cmd.Flags().BoolP("count-prompt", "C", false, "Prompt for the number of draws to generate.")
 
