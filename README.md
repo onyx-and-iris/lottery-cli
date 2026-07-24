@@ -37,7 +37,7 @@ export LOTTERY_COUNT_PROMPT=false
 
 There are no subcommands, just run the CLI directly passing any desired flags:
 
-```bash
+```console
 lottery --count=3
 ```
 
