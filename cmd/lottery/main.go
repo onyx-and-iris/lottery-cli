@@ -10,6 +10,7 @@ import (
 	"charm.land/huh/v2"
 	"github.com/charmbracelet/fang"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/onyx-and-iris/lottery-cli"
 )
@@ -62,11 +63,44 @@ var cmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		l.Draw()
-		fmt.Println(renderDraw(l))
+
+		if countPrompt := viper.GetBool("count-prompt"); countPrompt {
+			var count string
+			countPrompt := huh.NewForm(
+				huh.NewGroup(
+					huh.NewInput().
+						Title("How many draws would you like to generate?").
+						Value(&count),
+				),
+			)
+			err := countPrompt.Run()
+			if err != nil {
+				return err
+			}
+			viper.Set("count", count)
+		}
+
+		count := viper.GetInt("count")
+
+		for range count {
+			l.Draw()
+			fmt.Println(renderDraw(l))
+		}
 
 		return nil
 	},
+}
+
+func init() {
+	cmd.Flags().IntP("count", "c", 1, "Number of draws to generate.")
+	cmd.Flags().BoolP("count-prompt", "C", false, "Prompt for the number of draws to generate.")
+
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+	viper.SetEnvPrefix("LOTTERY")
+	viper.AutomaticEnv()
+	if err := viper.BindPFlags(cmd.Flags()); err != nil {
+		panic(err)
+	}
 }
 
 func main() {
