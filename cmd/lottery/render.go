@@ -134,6 +134,7 @@ func maxLineWidth(blocks []string) int {
 	return maxWidth
 }
 
+// renderDrawCollection renders a collection of draw entries into a single string with a title and separator lines.
 func renderDrawCollection(title string, entries []string) string {
 	if len(entries) == 0 {
 		return ""
@@ -148,4 +149,26 @@ func renderDrawCollection(title string, entries []string) string {
 	}
 
 	return cardStyle.Render(title + "\n" + body)
+}
+
+// renderKindList renders a list of lottery kinds into a formatted string.
+func renderKindList(kinds []lottery.Kind) string {
+	lines := make([]string, 0, len(kinds)+1)
+	lines = append(
+		lines,
+		labelStyle.Render("Total:")+" "+numbersStyle.Render(strconv.Itoa(len(kinds))),
+	)
+
+	for _, kind := range kinds {
+		lines = append(
+			lines,
+			specialStyle.Render("•")+
+				" "+numbersStyle.Render(kindPromptLabel(kind))+
+				" "+labelStyle.Render("("+string(kind)+")"),
+		)
+	}
+
+	return cardStyle.Render(
+		titleStyle.Render("Available lottery kinds") + "\n" + strings.Join(lines, "\n"),
+	)
 }
