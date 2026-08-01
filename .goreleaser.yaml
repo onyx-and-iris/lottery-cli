@@ -17,6 +17,7 @@ before:
 
 builds:
   - main: ./cmd/lottery/
+    binary: lottery
     env:
       - CGO_ENABLED=0
     goos:
