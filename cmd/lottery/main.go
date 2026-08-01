@@ -29,17 +29,12 @@ func versionFromBuild() string {
 	return strings.Split(info.Main.Version, "-")[0]
 }
 
-var cmd = &cobra.Command{
+var rootCmd = &cobra.Command{
 	Use:   "lottery",
 	Short: "A CLI for National Lottery games.",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		kindStr := viper.GetString("kind")
-		if kindStr != "" {
-			_, err := lottery.ParseKind(kindStr)
-			if err != nil {
-				return err
-			}
-		}
+		cmd.MarkFlagsMutuallyExclusive("count", "count-prompt")
+
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -49,13 +44,7 @@ var cmd = &cobra.Command{
 				huh.NewGroup(
 					huh.NewSelect[string]().
 						Title("Pick a lottery.").
-						Options(
-							huh.NewOption("Lotto", "lotto"),
-							huh.NewOption("EuroMillions", "euromillions"),
-							huh.NewOption("Set For Life", "setforlife"),
-							huh.NewOption("Thunderball", "thunderball"),
-							huh.NewOption("Powerball", "powerball"),
-						).
+						Options(kindPromptOptions()...).
 						Value(&kindStr),
 				),
 			)
@@ -77,17 +66,12 @@ var cmd = &cobra.Command{
 
 		if countPrompt := viper.GetBool("count-prompt"); countPrompt {
 			var count string
-			countPrompt := huh.NewForm(
-				huh.NewGroup(
-					huh.NewInput().
-						Title("How many draws would you like to generate?").
-						Value(&count),
-				),
-			)
-			err := countPrompt.Run()
-			if err != nil {
+			if err := huh.NewInput().
+				Title("How many draws would you like to generate?").
+				Value(&count).Run(); err != nil {
 				return err
 			}
+
 			viper.Set("count", count)
 		}
 
@@ -111,15 +95,41 @@ var cmd = &cobra.Command{
 	},
 }
 
+func kindPromptLabel(kind lottery.Kind) string {
+	switch kind {
+	case lottery.KindLotto:
+		return "Lotto"
+	case lottery.KindEuroMillions:
+		return "EuroMillions"
+	case lottery.KindSetForLife:
+		return "Set For Life"
+	case lottery.KindThunderball:
+		return "Thunderball"
+	case lottery.KindPowerball:
+		return "Powerball"
+	default:
+		return string(kind)
+	}
+}
+
+func kindPromptOptions() []huh.Option[string] {
+	kinds := lottery.AllKinds()
+	options := make([]huh.Option[string], 0, len(kinds))
+	for _, kind := range kinds {
+		options = append(options, huh.NewOption(kindPromptLabel(kind), string(kind)))
+	}
+	return options
+}
+
 func init() {
-	cmd.Flags().StringP("kind", "k", "", "Lottery kind to generate draws for.")
-	cmd.Flags().IntP("count", "c", 1, "Number of draws to generate.")
-	cmd.Flags().BoolP("count-prompt", "C", false, "Prompt for the number of draws to generate.")
+	rootCmd.Flags().StringP("kind", "k", "", "Lottery kind to generate draws for.")
+	rootCmd.Flags().IntP("count", "c", 1, "Number of draws to generate.")
+	rootCmd.Flags().BoolP("count-prompt", "C", false, "Prompt for the number of draws to generate.")
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.SetEnvPrefix("LOTTERY")
 	viper.AutomaticEnv()
-	if err := viper.BindPFlags(cmd.Flags()); err != nil {
+	if err := viper.BindPFlags(rootCmd.Flags()); err != nil {
 		panic(err)
 	}
 }
@@ -127,7 +137,7 @@ func init() {
 func main() {
 	if err := fang.Execute(
 		context.Background(),
-		cmd,
+		rootCmd,
 		fang.WithVersion(versionFromBuild()),
 	); err != nil {
 		os.Exit(1)
