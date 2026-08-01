@@ -23,7 +23,7 @@ go install github.com/onyx-and-iris/lottery-cli/cmd/lottery@latest
 -   --kind/-k: The kind of lottery.
 -   --count/-c: Number of draws to generate.
 -   --count-prompt/-C: Prompt for the number of draws to generate.
-> Note. If both --count and --count-prompt are passed the count prompt will win.
+> Note. --count and --count-prompt flags are mutually exclusive.
 
 *environment variables*
 
@@ -36,6 +36,8 @@ export LOTTERY_COUNT_PROMPT=false
 ```
 
 ## Use
+
+### RootCmd
 
 Run with the selection prompt without prompting for a count:
 
@@ -58,13 +60,21 @@ lottery --count=4
 Run a single draw directly:
 
 ```console
-lottery -k=euromillions 
+lottery --kind=euromillions 
 ```
 
 Run multiple draws directly:
 
 ```console
-lottery -k=euromillions -c=3
+lottery --kind=euromillions --count=3
+```
+
+### ListCmd
+
+List the available lotteries:
+
+```console
+lottery list
 ```
 
 ## Special Thanks
