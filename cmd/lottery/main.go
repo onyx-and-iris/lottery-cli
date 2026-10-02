@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"charm.land/huh/v2"
+	"charm.land/log/v2"
 	"github.com/charmbracelet/fang"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -33,8 +34,18 @@ var rootCmd = &cobra.Command{
 	Use:   "lottery",
 	Short: "A CLI for National Lottery games.",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
+		level, err := log.ParseLevel(viper.GetString("log-level"))
+		if err != nil {
+			return fmt.Errorf("invalid log level: %w", err)
+		}
+		log.SetLevel(level)
+
 		// Fail fast if the count is invalid when the count-prompt flag is not set.
-		return validateNonPromptCount()
+		if err := validateNonPromptCount(); err != nil {
+			return err
+		}
+
+		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		kindStr := viper.GetString("kind")
@@ -139,6 +150,9 @@ func kindPromptOptions() []huh.Option[string] {
 }
 
 func init() {
+	rootCmd.PersistentFlags().String("log-level", "info", "Log level (debug, info, warn, error)")
+	viper.BindPFlag("log-level", rootCmd.PersistentFlags().Lookup("log-level"))
+
 	rootCmd.Flags().StringP("kind", "k", "", "Lottery kind to generate draws for.")
 	rootCmd.Flags().IntP("count", "c", 1, "Number of draws to generate.")
 	rootCmd.Flags().BoolP("count-prompt", "C", false, "Prompt for the number of draws to generate.")
